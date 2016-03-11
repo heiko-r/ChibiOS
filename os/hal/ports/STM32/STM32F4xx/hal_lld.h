@@ -1119,7 +1119,7 @@
 /**
  * @brief   PLL VCO frequency.
  */
-#define STM32_PLLVCO                (STM32_PLLCLKIN * STM32_PLLN_VALUE)
+#define STM32_PLLVCO                ((STM32_HSECLK * STM32_PLLN_VALUE) / STM32_PLLM_VALUE)
 
 /*
  * PLL VCO frequency range check.
@@ -1368,7 +1368,7 @@
 /**
  * @brief   PLL VCO frequency.
  */
-#define STM32_PLLI2SVCO             (STM32_PLLCLKIN * STM32_PLLI2SN_VALUE)
+#define STM32_PLLI2SVCO             ((STM32_HSECLK * STM32_PLLI2SN_VALUE) / STM32_PLLM_VALUE)
 
 /*
  * PLLI2S VCO frequency range check.
