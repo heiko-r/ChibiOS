@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 */
 
 /**
- * @file lpc214x.h
- * @brief LPC214x register definitions.
+ * @file    lpc214x.h
+ * @brief   LPC214x register definitions.
  */
 
-#ifndef _LPC214X_H_
-#define _LPC214X_H_
+#ifndef LPC214X_H
+#define LPC214X_H
 
 typedef volatile uint8_t IOREG8;
 typedef volatile uint16_t IOREG16;
@@ -519,5 +519,5 @@ typedef struct {
  */
 #define DACR                    (*((IOREG32 *)0xE006C000))
 
-#endif /* _LPC214X_H_ */
+#endif /* LPC214X_H */
 

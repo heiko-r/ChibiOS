@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -234,7 +234,7 @@ void chSysInit(void) {
   tcp = nil_thd_configs;
   while (tp < &nil.threads[CH_CFG_NUM_THREADS]) {
 #if CH_DBG_ENABLE_STACK_CHECK
-    tp->stklimit  = (stkalign_t *)tcp->wbase;
+    tp->wabase  = (stkalign_t *)tcp->wbase;
 #endif
 
     /* Port dependent thread initialization.*/
@@ -250,7 +250,7 @@ void chSysInit(void) {
 #if CH_DBG_ENABLE_STACK_CHECK
   /* The idle thread is a special case because its stack is set up by the
      runtime environment.*/
-  tp->stklimit  = THD_IDLE_BASE;
+  tp->wabase  = THD_IDLE_BASE;
 #endif
 
   /* Interrupts partially enabled. It is equivalent to entering the
@@ -298,6 +298,7 @@ void chSysHalt(const char *reason) {
   (void)reason;
 #endif
 
+  /* Halt hook code, usually empty.*/
   CH_CFG_SYSTEM_HALT_HOOK(reason);
 
   /* Harmless infinite loop.*/
@@ -824,10 +825,6 @@ msg_t chSemWaitTimeoutS(semaphore_t *sp, systime_t timeout) {
 
 /**
  * @brief   Performs a signal operation on a semaphore.
- * @post    This function does not reschedule so a call to a rescheduling
- *          function must be performed before unlocking the kernel. Note that
- *          interrupt handlers always reschedule on exit so an explicit
- *          reschedule must not be performed in ISRs.
  *
  * @param[in] sp    pointer to a @p semaphore_t structure
  *
@@ -881,10 +878,6 @@ void chSemSignalI(semaphore_t *sp) {
  * @post    After invoking this function all the threads waiting on the
  *          semaphore, if any, are released and the semaphore counter is set
  *          to the specified, non negative, value.
- * @post    This function does not reschedule so a call to a rescheduling
- *          function must be performed before unlocking the kernel. Note that
- *          interrupt handlers always reschedule on exit so an explicit
- *          reschedule must not be performed in ISRs.
  *
  * @param[in] sp        pointer to a @p semaphore_t structure
  * @param[in] n         the new value of the semaphore counter. The value must

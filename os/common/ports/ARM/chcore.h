@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHCORE_H_
-#define _CHCORE_H_
+#ifndef CHCORE_H
+#define CHCORE_H
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -337,7 +337,7 @@ struct port_context {
 #if CH_DBG_ENABLE_STACK_CHECK == TRUE
 #define port_switch(ntp, otp) {                                             \
   register struct port_intctx *r13 asm ("r13");                             \
-  if ((stkalign_t *)(r13 - 1) < otp->p_stklimit)                            \
+  if ((stkalign_t *)(r13 - 1) < otp->wabase)                                \
     chSysHalt("stack overflow");                                            \
   _port_switch_thumb(ntp, otp);                                             \
 }
@@ -350,7 +350,7 @@ struct port_context {
 #if CH_DBG_ENABLE_STACK_CHECK == TRUE
 #define port_switch(ntp, otp) {                                             \
   register struct port_intctx *r13 asm ("r13");                             \
-  if ((stkalign_t *)(r13 - 1) < otp->stklimit)                              \
+  if ((stkalign_t *)(r13 - 1) < otp->wabase)                                \
   chSysHalt("stack overflow");                                              \
   _port_switch_arm(ntp, otp);                                               \
 }
@@ -559,6 +559,6 @@ static inline void port_wait_for_interrupt(void) {
 
 #endif /* !defined(_FROM_ASM_) */
 
-#endif /* _CHCORE_H_ */
+#endif /* CHCORE_H */
 
 /** @} */

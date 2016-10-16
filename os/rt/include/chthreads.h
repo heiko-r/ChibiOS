@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHTHREADS_H_
-#define _CHTHREADS_H_
+#ifndef CHTHREADS_H
+#define CHTHREADS_H
 
 /*lint -sem(chThdExit, r_no) -sem(chThdExitS, r_no)*/
 
@@ -118,6 +118,59 @@ typedef struct {
  */
 #define _THREADS_QUEUE_DECL(name)                                           \
   threads_queue_t name = _THREADS_QUEUE_DATA(name)
+/** @} */
+
+/**
+ * @name    Working Areas
+ */
+/**
+ * @brief   Calculates the total Working Area size.
+ *
+ * @param[in] n         the stack size to be assigned to the thread
+ * @return              The total used memory in bytes.
+ *
+ * @api
+ */
+#define THD_WORKING_AREA_SIZE(n)                                            \
+  MEM_ALIGN_NEXT(sizeof(thread_t) + PORT_WA_SIZE(n), PORT_STACK_ALIGN)
+
+/**
+ * @brief   Static working area allocation.
+ * @details This macro is used to allocate a static thread working area
+ *          aligned as both position and size.
+ *
+ * @param[in] s         the name to be assigned to the stack array
+ * @param[in] n         the stack size to be assigned to the thread
+ *
+ * @api
+ */
+#define THD_WORKING_AREA(s, n) PORT_WORKING_AREA(s, n)
+
+/**
+ * @brief   Base of a working area casted to the correct type.
+ *
+ * @param[in] s         name of the working area
+ */
+#define THD_WORKING_AREA_BASE(s) ((stkalign_t *)(s))
+
+/**
+ * @brief   End of a working area casted to the correct type.
+ *
+ * @param[in] s         name of the working area
+ */
+#define THD_WORKING_AREA_END(s) (THD_WORKING_AREA_BASE(s) +                 \
+                                 (sizeof (s) / sizeof (stkalign_t)))
+/** @} */
+
+/**
+ * @name    Threads abstraction macros
+ */
+/**
+ * @brief   Thread declaration macro.
+ * @note    Thread declarations should be performed using this macro because
+ *          the port layer could define optimizations for thread functions.
+ */
+#define THD_FUNCTION(tname, arg) PORT_THD_FUNCTION(tname, arg)
 /** @} */
 
 /**
@@ -254,18 +307,21 @@ static inline systime_t chThdGetTicksX(thread_t *tp) {
 }
 #endif
 
+#if (CH_DBG_ENABLE_STACK_CHECK == TRUE) || (CH_CFG_USE_DYNAMIC == TRUE) ||  \
+    defined(__DOXYGEN__)
 /**
- * @brief   Returns the stack limit of the specified thread.
+ * @brief   Returns the working area base of the specified thread.
  *
  * @param[in] tp        pointer to the thread
- * @return              The stack limit pointer.
+ * @return              The working area base pointer.
  *
  * @xclass
  */
-static inline stkalign_t *chthdGetStackLimitX(thread_t *tp) {
+static inline stkalign_t *chThdGetWorkingAreaX(thread_t *tp) {
 
-  return tp->stklimit;
+  return tp->wabase;
 }
+#endif /* CH_DBG_ENABLE_STACK_CHECK == TRUE */
 
 /**
  * @brief   Verifies if the specified thread is in the @p CH_STATE_FINAL state.
@@ -383,6 +439,6 @@ static inline void chThdDoDequeueNextI(threads_queue_t *tqp, msg_t msg) {
   (void) chSchReadyI(tp);
 }
 
-#endif /* _CHTHREADS_H_ */
+#endif /* CHTHREADS_H */
 
 /** @} */

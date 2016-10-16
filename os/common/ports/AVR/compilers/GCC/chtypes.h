@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHTYPES_H_
-#define _CHTYPES_H_
+#ifndef CHTYPES_H
+#define CHTYPES_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -66,7 +66,7 @@ typedef int16_t             msg_t;          /**< Inter-thread message.      */
 typedef int32_t             eventid_t;      /**< Numeric event identifier.  */
 typedef uint8_t             eventmask_t;    /**< Mask of event identifiers. */
 typedef uint8_t             eventflags_t;   /**< Mask of event flags.       */
-typedef uint8_t             cnt_t;          /**< Generic signed counter.    */
+typedef int8_t              cnt_t;          /**< Generic signed counter.    */
 typedef uint8_t             ucnt_t;         /**< Generic unsigned counter.  */
 /** @} */
 
@@ -74,14 +74,14 @@ typedef uint8_t             ucnt_t;         /**< Generic unsigned counter.  */
  * @brief   ROM constant modifier.
  * @note    It is set to use the "const" keyword in this port.
  */
-#define ROMCONST const
+#define ROMCONST            const
 
 /**
  * @brief   Makes functions not inlineable.
  * @note    If the compiler does not support such attribute then the
  *          realtime counter precision could be degraded.
  */
-#define NOINLINE __attribute__((noinline))
+#define NOINLINE            __attribute__((noinline))
 
 /**
  * @brief   Optimized thread function declaration macro.
@@ -91,13 +91,25 @@ typedef uint8_t             ucnt_t;         /**< Generic unsigned counter.  */
 /**
  * @brief   Packed variable specifier.
  */
-#define PACKED_VAR __attribute__((packed))
+#define PACKED_VAR          __attribute__((packed))
 
 /**
  * @brief   Memory alignment enforcement for variables.
  */
-#define ALIGNED_VAR(n) __attribute__((aligned(n)))
+#define ALIGNED_VAR(n)      __attribute__((aligned(n)))
 
-#endif /* _CHTYPES_H_ */
+/**
+ * @brief   Size of a pointer.
+ * @note    To be used where the sizeof operator cannot be used, preprocessor
+ *          expressions for example.
+ */
+#define SIZEOF_PTR          2
+
+/**
+ * @brief   True if alignment is low-high in current architecture.
+ */
+#define REVERSE_ORDER       1
+
+#endif /* CHTYPES_H */
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHCORE_V6M_H_
-#define _CHCORE_V6M_H_
+#ifndef CHCORE_V6M_H
+#define CHCORE_V6M_H
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -117,6 +117,14 @@
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
+
+#if !defined(CH_CUSTOMER_LICENSED_PORT_CM0)
+#error "CH_CUSTOMER_LICENSED_PORT_CM0 not defined"
+#endif
+
+#if CH_CUSTOMER_LICENSED_PORT_CM0 == FALSE
+#error "ChibiOS Cortex-M0 port not licensed"
+#endif
 
 /**
  * @name    Architecture and Compiler
@@ -285,7 +293,7 @@ struct port_intctx {
 #else
 #define port_switch(ntp, otp) {                                             \
   struct port_intctx *r13 = (struct port_intctx *)__get_PSP();              \
-  if ((stkalign_t *)(r13 - 1) < (otp)->stklimit) {                          \
+  if ((stkalign_t *)(r13 - 1) < (otp)->wabase) {                            \
     chSysHalt("stack overflow");                                            \
   }                                                                         \
   _port_switch(ntp, otp);                                                   \
@@ -435,6 +443,6 @@ static inline void port_wait_for_interrupt(void) {
 
 #endif /* _FROM_ASM_ */
 
-#endif /* _CHCORE_V6M_H_ */
+#endif /* CHCORE_V6M_H */
 
 /** @} */

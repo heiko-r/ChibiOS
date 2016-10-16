@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef _SHELLCMD_H_
-#define _SHELLCMD_H_
+#ifndef SHELLCMD_H
+#define SHELLCMD_H
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -32,6 +32,10 @@
 /*===========================================================================*/
 /* Module pre-compile time settings.                                         */
 /*===========================================================================*/
+
+#if !defined(SHELL_CMD_EXIT_ENABLED) || defined(__DOXYGEN__)
+#define SHELL_CMD_EXIT_ENABLED              TRUE
+#endif
 
 #if !defined(SHELL_CMD_INFO_ENABLED) || defined(__DOXYGEN__)
 #define SHELL_CMD_INFO_ENABLED              TRUE
@@ -105,6 +109,6 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#endif /* _SHELLCMD_H_ */
+#endif /* SHELLCMD_H */
 
 /** @} */
