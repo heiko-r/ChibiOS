@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -34,6 +34,7 @@
 #endif
 
 #define _FROM_ASM_
+#include "chlicense.h"
 #include "chconf.h"
 #include "chcore.h"
 

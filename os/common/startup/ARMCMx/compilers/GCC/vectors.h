@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,10 +22,20 @@
  * @{
  */
 
-#ifndef _VECTORS_H_
-#define _VECTORS_H_
+#ifndef VECTORS_H
+#define VECTORS_H
 
 #include "cmparams.h"
+
+/* This inclusion can be used to remap vectors using different names.
+ * Example:
+ * #define Vector7C UartRX_Handler
+ * This can be useful when using 3rd part libraries that assume specific
+ * vector names.
+ */
+#if defined(VECTORS_USE_CONF)
+#include "vectorsconf.h"
+#endif
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -97,6 +107,6 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#endif /* _VECTORS_H_ */
+#endif /* VECTORS_H */
 
 /** @} */

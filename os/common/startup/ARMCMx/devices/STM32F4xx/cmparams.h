@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CMPARAMS_H_
-#define _CMPARAMS_H_
+#ifndef CMPARAMS_H
+#define CMPARAMS_H
 
 /**
  * @brief   Cortex core model.
@@ -62,7 +62,9 @@
     !defined(STM32F427xx) && !defined(STM32F437xx) &&                       \
     !defined(STM32F429xx) && !defined(STM32F439xx) &&                       \
     !defined(STM32F401xC) && !defined(STM32F401xE) &&                       \
-    !defined(STM32F411xE)
+    !defined(STM32F410Cx) && !defined(STM32F410Rx) &&                       \
+    !defined(STM32F411xE) && !defined(STM32F446xx) &&                       \
+    !defined(STM32F469xx) && !defined(STM32F479xx)
 #include "board.h"
 #endif
 
@@ -85,6 +87,6 @@
 
 #endif /* !defined(_FROM_ASM_) */
 
-#endif /* _CMPARAMS_H_ */
+#endif /* CMPARAMS_H */
 
 /** @} */

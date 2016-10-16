@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -28,8 +28,8 @@
  * @{
  */
 
-#ifndef _CHEVENTS_H_
-#define _CHEVENTS_H_
+#ifndef CHEVENTS_H
+#define CHEVENTS_H
 
 #if (CH_CFG_USE_EVENTS == TRUE) || defined(__DOXYGEN__)
 
@@ -271,6 +271,6 @@ static inline eventmask_t chEvtGetEventsX(void) {
 
 #endif /* CH_CFG_USE_EVENTS == TRUE */
 
-#endif /* _CHEVENTS_H_ */
+#endif /* CHEVENTS_H */
 
 /** @} */

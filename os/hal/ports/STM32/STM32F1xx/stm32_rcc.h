@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -1048,6 +1048,29 @@
  * @api
  */
 #define rccResetUSB() rccResetAPB1(RCC_APB1RSTR_USBRST)
+/** @} */
+
+/**
+ * @name    FSMC peripherals specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the FSMC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableFSMC(lp) rccEnableAHB(RCC_AHBENR_FSMCEN, lp)
+
+/**
+ * @brief   Disables the FSMC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableFSMC(lp) rccDisableAHB(RCC_AHBENR_FSMCEN, lp)
 /** @} */
 
 /*===========================================================================*/

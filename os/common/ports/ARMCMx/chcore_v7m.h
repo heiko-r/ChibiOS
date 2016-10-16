@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHCORE_V7M_H_
-#define _CHCORE_V7M_H_
+#ifndef CHCORE_V7M_H
+#define CHCORE_V7M_H
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -151,13 +151,6 @@
 #endif
 
 /**
- * @brief   NVIC VTOR initialization expression.
- */
-#if !defined(CORTEX_VTOR_INIT) || defined(__DOXYGEN__)
-#define CORTEX_VTOR_INIT                0x00000000U
-#endif
-
-/**
  * @brief   NVIC PRIGROUP initialization expression.
  * @details The default assigns all available priority bits as preemption
  *          priority with no sub-priority.
@@ -192,6 +185,15 @@
  * @{
  */
 #if (CORTEX_MODEL == 3) || defined(__DOXYGEN__)
+
+  #if !defined(CH_CUSTOMER_LICENSED_PORT_CM3)
+    #error "CH_CUSTOMER_LICENSED_PORT_CM3 not defined"
+  #endif
+
+  #if CH_CUSTOMER_LICENSED_PORT_CM3 == FALSE
+    #error "ChibiOS Cortex-M3 port not licensed"
+  #endif
+
 /**
  * @brief   Macro defining the specific ARM architecture.
  */
@@ -212,6 +214,15 @@
 #endif
 
 #elif (CORTEX_MODEL == 4)
+
+  #if !defined(CH_CUSTOMER_LICENSED_PORT_CM4)
+    #error "CH_CUSTOMER_LICENSED_PORT_CM4 not defined"
+  #endif
+
+  #if CH_CUSTOMER_LICENSED_PORT_CM4 == FALSE
+  #error "ChibiOS Cortex-M4 port not licensed"
+  #endif
+
   #define PORT_ARCHITECTURE_ARM_v7ME
   #define PORT_ARCHITECTURE_NAME        "ARMv7E-M"
   #if CORTEX_USE_FPU
@@ -229,7 +240,16 @@
   #endif
 
 #elif (CORTEX_MODEL == 7)
-  #define PORT_ARCHITECTURE_ARM_v7ME
+
+  #if !defined(CH_CUSTOMER_LICENSED_PORT_CM7)
+    #error "CH_CUSTOMER_LICENSED_PORT_CM7 not defined"
+  #endif
+
+  #if CH_CUSTOMER_LICENSED_PORT_CM7 == FALSE
+    #error "ChibiOS Cortex-M7 port not licensed"
+  #endif
+
+#define PORT_ARCHITECTURE_ARM_v7ME
   #define PORT_ARCHITECTURE_NAME        "ARMv7E-M"
   #if CORTEX_USE_FPU
     #if PORT_ENABLE_GUARD_PAGES == FALSE
@@ -440,7 +460,7 @@ struct port_intctx {
 #if PORT_ENABLE_GUARD_PAGES == FALSE
 #define port_switch(ntp, otp) {                                             \
   struct port_intctx *r13 = (struct port_intctx *)__get_PSP();              \
-  if ((stkalign_t *)(r13 - 1) < (otp)->stklimit) {                          \
+  if ((stkalign_t *)(r13 - 1) < (otp)->wabase) {                            \
     chSysHalt("stack overflow");                                            \
   }                                                                         \
   _port_switch(ntp, otp);                                                   \
@@ -451,7 +471,7 @@ struct port_intctx {
                                                                             \
   /* Setting up the guard page for the switched-in thread.*/                \
   mpuConfigureRegion(MPU_REGION_0,                                          \
-                     chThdGetSelfX()->stklimit,                             \
+                     chThdGetSelfX()->wabase,                               \
                      MPU_RASR_ATTR_AP_NA_NA |                               \
                      MPU_RASR_ATTR_NON_CACHEABLE |                          \
                      MPU_RASR_SIZE_32 |                                     \
@@ -484,9 +504,6 @@ extern "C" {
  * @brief   Port-related initialization code.
  */
 static inline void port_init(void) {
-
-  /* Initialization of the vector table and priority related settings.*/
-  SCB->VTOR = CORTEX_VTOR_INIT;
 
   /* Initializing priority grouping.*/
   NVIC_SetPriorityGrouping(CORTEX_PRIGROUP_INIT);
@@ -693,6 +710,6 @@ static inline rtcnt_t port_rt_get_counter_value(void) {
 
 #endif /* !defined(_FROM_ASM_) */
 
-#endif /* _CHCORE_V7M_H_ */
+#endif /* CHCORE_V7M_H */
 
 /** @} */

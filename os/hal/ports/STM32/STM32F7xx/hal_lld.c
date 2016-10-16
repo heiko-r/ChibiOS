@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ void hal_lld_init(void) {
   /* The SRAM2 bank can optionally made a non cache-able area for use by
      DMA engines.*/
   mpuConfigureRegion(MPU_REGION_7,
-                     0x2004C000U,
+                     SRAM2_BASE,
                      MPU_RASR_ATTR_AP_RW_RW |
                      MPU_RASR_ATTR_NON_CACHEABLE |
                      MPU_RASR_SIZE_16K |

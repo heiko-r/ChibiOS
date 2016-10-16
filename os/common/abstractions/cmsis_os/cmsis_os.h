@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -28,8 +28,8 @@
  * @{
  */
 
-#ifndef _CMSIS_OS_H_
-#define _CMSIS_OS_H_
+#ifndef CMSIS_OS_H
+#define CMSIS_OS_H
 
 #include "ch.h"
 
@@ -76,7 +76,7 @@
 /**
  * @brief   System tick frequency.
  */
-#define osKernelSysTickFrequency    CH_CFG_FREQUENCY
+#define osKernelSysTickFrequency    CH_CFG_ST_FREQUENCY
 
 /*===========================================================================*/
 /* Module pre-compile time settings.                                         */
@@ -504,7 +504,7 @@ static inline osStatus osThreadYield(void) {
  */
 static inline osPriority osThreadGetPriority(osThreadId thread_id) {
 
-  return thread_id->prio;
+  return (osPriority)(NORMALPRIO - thread_id->prio);
 }
 
 /**
@@ -517,6 +517,6 @@ static inline osStatus osDelay(uint32_t millisec) {
   return osOK;
 }
 
-#endif /* _CMSIS_OS_H_ */
+#endif /* CMSIS_OS_H */
 
 /** @} */

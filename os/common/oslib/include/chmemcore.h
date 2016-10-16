@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHMEMCORE_H_
-#define _CHMEMCORE_H_
+#ifndef CHMEMCORE_H
+#define CHMEMCORE_H
 
 #if (CH_CFG_USE_MEMCORE == TRUE) || defined(__DOXYGEN__)
 
@@ -49,7 +49,9 @@
  *          provide the @p __heap_base__ and @p __heap_end__ symbols.
  * @note    Requires @p CH_CFG_USE_MEMCORE.
  */
+#if !defined(CH_CFG_MEMCORE_SIZE) || defined(__DOXYGEN__)
 #define CH_CFG_MEMCORE_SIZE                 0
+#endif
 
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
@@ -125,6 +127,6 @@ static inline void *chCoreAlloc(size_t size) {
 
 #endif /* CH_CFG_USE_MEMCORE == TRUE */
 
-#endif /* _CHMEMCORE_H_ */
+#endif /* CHMEMCORE_H */
 
 /** @} */
