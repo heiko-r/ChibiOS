@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHCORE_H_
-#define _CHCORE_H_
+#ifndef CHCORE_H
+#define CHCORE_H
 
 #include "intc.h"
 
@@ -178,13 +178,53 @@
  * @brief   Name of the architecture variant.
  */
 #if (PPC_VARIANT == PPC_VARIANT_e200z0) || defined(__DOXYGEN__)
+
+#if !defined(CH_CUSTOMER_LICENSED_PORT_E200Z0)
+#error "CH_CUSTOMER_LICENSED_PORT_E200Z0 not defined"
+#endif
+
+#if CH_CUSTOMER_LICENSED_PORT_E200Z0 == FALSE
+#error "ChibiOS Power e200z0 port not licensed"
+#endif
+
 #define PORT_CORE_VARIANT_NAME          "e200z0"
+
 #elif PPC_VARIANT == PPC_VARIANT_e200z2
+
+#if !defined(CH_CUSTOMER_LICENSED_PORT_E200Z2)
+#error "CH_CUSTOMER_LICENSED_PORT_E200Z2 not defined"
+#endif
+
+#if CH_CUSTOMER_LICENSED_PORT_E200Z2 == FALSE
+#error "ChibiOS Power e200z2 port not licensed"
+#endif
+
 #define PORT_CORE_VARIANT_NAME          "e200z2"
+
 #elif PPC_VARIANT == PPC_VARIANT_e200z3
+
+#if !defined(CH_CUSTOMER_LICENSED_PORT_E200Z3)
+#error "CH_CUSTOMER_LICENSED_PORT_E200Z3 not defined"
+#endif
+
+#if CH_CUSTOMER_LICENSED_PORT_E200Z3 == FALSE
+#error "ChibiOS Power e200z3 port not licensed"
+#endif
+
 #define PORT_CORE_VARIANT_NAME          "e200z3"
+
 #elif PPC_VARIANT == PPC_VARIANT_e200z4
+
+#if !defined(CH_CUSTOMER_LICENSED_PORT_E200Z4)
+#error "CH_CUSTOMER_LICENSED_PORT_E200Z4 not defined"
+#endif
+
+#if CH_CUSTOMER_LICENSED_PORT_E200Z4 == FALSE
+#error "ChibiOS Power e200z4 port not licensed"
+#endif
+
 #define PORT_CORE_VARIANT_NAME          "e200z4"
+
 #else
 #error "unknown or unsupported PowerPC variant specified"
 #endif
@@ -392,7 +432,7 @@ struct port_context {
 #else
 #define port_switch(ntp, otp) {                                             \
   register struct port_intctx *sp asm ("%r1");                              \
-  if ((stkalign_t *)(sp - 1) < otp->stklimit)                               \
+  if ((stkalign_t *)(sp - 1) < otp->wabase)                                 \
     chSysHalt("stack overflow");                                            \
   _port_switch(ntp, otp);                                                   \
 }
@@ -626,6 +666,6 @@ static inline rtcnt_t port_rt_get_counter_value(void) {
 
 #endif /* !defined(_FROM_ASM_) */
 
-#endif /* _CHCORE_H_ */
+#endif /* CHCORE_H */
 
 /** @} */

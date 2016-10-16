@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -87,12 +87,12 @@ void queue_prio_insert(thread_t *tp, threads_queue_t *tqp) {
 
   thread_t *cp = (thread_t *)tqp;
   do {
-    cp = cp->next;
+    cp = cp->queue.next;
   } while ((cp != (thread_t *)tqp) && (cp->prio >= tp->prio));
-  tp->next = cp;
-  tp->prev = cp->prev;
-  tp->prev->next = tp;
-  cp->prev = tp;
+  tp->queue.next             = cp;
+  tp->queue.prev             = cp->queue.prev;
+  tp->queue.prev->queue.next = tp;
+  cp->queue.prev             = tp;
 }
 
 /**
@@ -105,10 +105,10 @@ void queue_prio_insert(thread_t *tp, threads_queue_t *tqp) {
  */
 void queue_insert(thread_t *tp, threads_queue_t *tqp) {
 
-  tp->next = (thread_t *)tqp;
-  tp->prev = tqp->prev;
-  tp->prev->next = tp;
-  tqp->prev = tp;
+  tp->queue.next             = (thread_t *)tqp;
+  tp->queue.prev             = tqp->prev;
+  tp->queue.prev->queue.next = tp;
+  tqp->prev                  = tp;
 }
 
 /**
@@ -124,8 +124,8 @@ void queue_insert(thread_t *tp, threads_queue_t *tqp) {
 thread_t *queue_fifo_remove(threads_queue_t *tqp) {
   thread_t *tp = tqp->next;
 
-  tqp->next = tp->next;
-  tqp->next->prev = (thread_t *)tqp;
+  tqp->next             = tp->queue.next;
+  tqp->next->queue.prev = (thread_t *)tqp;
 
   return tp;
 }
@@ -143,8 +143,8 @@ thread_t *queue_fifo_remove(threads_queue_t *tqp) {
 thread_t *queue_lifo_remove(threads_queue_t *tqp) {
   thread_t *tp = tqp->prev;
 
-  tqp->prev = tp->prev;
-  tqp->prev->next = (thread_t *)tqp;
+  tqp->prev             = tp->queue.prev;
+  tqp->prev->queue.next = (thread_t *)tqp;
 
   return tp;
 }
@@ -161,8 +161,8 @@ thread_t *queue_lifo_remove(threads_queue_t *tqp) {
  */
 thread_t *queue_dequeue(thread_t *tp) {
 
-  tp->prev->next = tp->next;
-  tp->next->prev = tp->prev;
+  tp->queue.prev->queue.next = tp->queue.next;
+  tp->queue.next->queue.prev = tp->queue.prev;
 
   return tp;
 }
@@ -177,8 +177,8 @@ thread_t *queue_dequeue(thread_t *tp) {
  */
 void list_insert(thread_t *tp, threads_list_t *tlp) {
 
-  tp->next = tlp->next;
-  tlp->next = tp;
+  tp->queue.next = tlp->next;
+  tlp->next      = tp;
 }
 
 /**
@@ -193,7 +193,7 @@ void list_insert(thread_t *tp, threads_list_t *tlp) {
 thread_t *list_remove(threads_list_t *tlp) {
 
   thread_t *tp = tlp->next;
-  tlp->next = tp->next;
+  tlp->next = tp->queue.next;
 
   return tp;
 }
@@ -227,13 +227,13 @@ thread_t *chSchReadyI(thread_t *tp) {
   tp->state = CH_STATE_READY;
   cp = (thread_t *)&ch.rlist.queue;
   do {
-    cp = cp->next;
+    cp = cp->queue.next;
   } while (cp->prio >= tp->prio);
   /* Insertion on prev.*/
-  tp->next = cp;
-  tp->prev = cp->prev;
-  tp->prev->next = tp;
-  cp->prev = tp;
+  tp->queue.next             = cp;
+  tp->queue.prev             = cp->queue.prev;
+  tp->queue.prev->queue.next = tp;
+  cp->queue.prev             = tp;
 
   return tp;
 }
@@ -266,13 +266,13 @@ thread_t *chSchReadyAheadI(thread_t *tp) {
   tp->state = CH_STATE_READY;
   cp = (thread_t *)&ch.rlist.queue;
   do {
-    cp = cp->next;
+    cp = cp->queue.next;
   } while (cp->prio > tp->prio);
   /* Insertion on prev.*/
-  tp->next = cp;
-  tp->prev = cp->prev;
-  tp->prev->next = tp;
-  cp->prev = tp;
+  tp->queue.next             = cp;
+  tp->queue.prev             = cp->queue.prev;
+  tp->queue.prev->queue.next = tp;
+  cp->queue.prev             = tp;
 
   return tp;
 }
@@ -287,24 +287,27 @@ thread_t *chSchReadyAheadI(thread_t *tp) {
  * @sclass
  */
 void chSchGoSleepS(tstate_t newstate) {
-  thread_t *otp;
+  thread_t *otp = currp;
 
   chDbgCheckClassS();
 
-  otp = currp;
+  /* New state.*/
   otp->state = newstate;
+
 #if CH_CFG_TIME_QUANTUM > 0
   /* The thread is renouncing its remaining time slices so it will have a new
      time quantum when it will wakeup.*/
   otp->preempt = (tslices_t)CH_CFG_TIME_QUANTUM;
 #endif
+
+  /* Next thread in ready list becomes current.*/
   currp = queue_fifo_remove(&ch.rlist.queue);
+  currp->state = CH_STATE_CURRENT;
+
+  /* Handling idle-enter hook.*/
   if (currp->prio == IDLEPRIO) {
     CH_CFG_IDLE_ENTER_HOOK();
   }
-
-  /* The extracted thread is marked as current.*/
-  currp->state = CH_STATE_CURRENT;
 
   /* Swap operation as tail call.*/
   chSysSwitch(currp, otp);
@@ -406,6 +409,7 @@ msg_t chSchGoSleepTimeoutS(tstate_t newstate, systime_t time) {
  * @sclass
  */
 void chSchWakeupS(thread_t *ntp, msg_t msg) {
+  thread_t *otp = currp;
 
   chDbgCheckClassS();
 
@@ -421,17 +425,19 @@ void chSchWakeupS(thread_t *ntp, msg_t msg) {
      one then it is just inserted in the ready list else it made
      running immediately and the invoking thread goes in the ready
      list instead.*/
-  if (ntp->prio <= currp->prio) {
+  if (ntp->prio <= otp->prio) {
     (void) chSchReadyI(ntp);
   }
   else {
-    thread_t *otp = chSchReadyI(currp);
-    currp = ntp;
+    otp = chSchReadyI(otp);
+
+    /* Handling idle-leave hook.*/
     if (otp->prio == IDLEPRIO) {
       CH_CFG_IDLE_LEAVE_HOOK();
     }
 
     /* The extracted thread is marked as current.*/
+    currp = ntp;
     ntp->state = CH_STATE_CURRENT;
 
     /* Swap operation as tail call.*/
@@ -500,14 +506,15 @@ void chSchDoRescheduleBehind(void) {
 
   /* Picks the first thread from the ready queue and makes it current.*/
   currp = queue_fifo_remove(&ch.rlist.queue);
+  currp->state = CH_STATE_CURRENT;
+
+  /* Handling idle-leave hook.*/
   if (otp->prio == IDLEPRIO) {
     CH_CFG_IDLE_LEAVE_HOOK();
   }
 
-  /* The extracted thread is marked as current.*/
-  currp->state = CH_STATE_CURRENT;
-
 #if CH_CFG_TIME_QUANTUM > 0
+  /* It went behind peers so it gets a new time quantum.*/
   otp->preempt = (tslices_t)CH_CFG_TIME_QUANTUM;
 #endif
 
@@ -532,12 +539,12 @@ void chSchDoRescheduleAhead(void) {
 
   /* Picks the first thread from the ready queue and makes it current.*/
   currp = queue_fifo_remove(&ch.rlist.queue);
+  currp->state = CH_STATE_CURRENT;
+
+  /* Handling idle-leave hook.*/
   if (otp->prio == IDLEPRIO) {
     CH_CFG_IDLE_LEAVE_HOOK();
   }
-
-  /* The extracted thread is marked as current.*/
-  currp->state = CH_STATE_CURRENT;
 
   /* Placing in ready list ahead of peers.*/
   otp = chSchReadyAheadI(otp);
@@ -561,12 +568,12 @@ void chSchDoReschedule(void) {
 
   /* Picks the first thread from the ready queue and makes it current.*/
   currp = queue_fifo_remove(&ch.rlist.queue);
+  currp->state = CH_STATE_CURRENT;
+
+  /* Handling idle-leave hook.*/
   if (otp->prio == IDLEPRIO) {
     CH_CFG_IDLE_LEAVE_HOOK();
   }
-
-  /* The extracted thread is marked as current.*/
-  currp->state = CH_STATE_CURRENT;
 
 #if CH_CFG_TIME_QUANTUM > 0
   /* If CH_CFG_TIME_QUANTUM is enabled then there are two different scenarios

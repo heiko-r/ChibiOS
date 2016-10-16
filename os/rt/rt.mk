@@ -1,10 +1,11 @@
 # List of all the ChibiOS/RT kernel files, there is no need to remove the files
 # from this list, you can disable parts of the kernel by editing chconf.h.
 ifeq ($(USE_SMART_BUILD),yes)
-CHCONF := $(strip $(shell cat chconf.h | egrep -e "define"))
+CHCONF := $(strip $(shell cat chconf.h | egrep -e "\#define"))
 
 KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chdebug.c \
+           $(CHIBIOS)/os/rt/src/chtrace.c \
            $(CHIBIOS)/os/rt/src/chvt.c \
            $(CHIBIOS)/os/rt/src/chschd.c \
            $(CHIBIOS)/os/rt/src/chthreads.c
@@ -32,9 +33,6 @@ endif
 ifneq ($(findstring CH_CFG_USE_MESSAGES TRUE,$(CHCONF)),)
 KERNSRC += $(CHIBIOS)/os/rt/src/chmsg.c
 endif
-ifneq ($(findstring CH_CFG_USE_QUEUES TRUE,$(CHCONF)),)
-KERNSRC += $(CHIBIOS)/os/rt/src/chqueues.c
-endif
 ifneq ($(findstring CH_CFG_USE_DYNAMIC TRUE,$(CHCONF)),)
 KERNSRC += $(CHIBIOS)/os/rt/src/chdynamic.c
 endif
@@ -53,6 +51,7 @@ endif
 else
 KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chdebug.c \
+           $(CHIBIOS)/os/rt/src/chtrace.c \
            $(CHIBIOS)/os/rt/src/chvt.c \
            $(CHIBIOS)/os/rt/src/chschd.c \
            $(CHIBIOS)/os/rt/src/chthreads.c \
@@ -64,7 +63,6 @@ KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chcond.c \
            $(CHIBIOS)/os/rt/src/chevents.c \
            $(CHIBIOS)/os/rt/src/chmsg.c \
-           $(CHIBIOS)/os/rt/src/chqueues.c \
            $(CHIBIOS)/os/rt/src/chdynamic.c \
            $(CHIBIOS)/os/common/oslib/src/chmboxes.c \
            $(CHIBIOS)/os/common/oslib/src/chmemcore.c \

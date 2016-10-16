@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "test.h"
+#include "ch_test.h"
 #include "shell.h"
 #include "chprintf.h"
 
@@ -104,7 +104,6 @@ static THD_FUNCTION(Thread1, arg) {
  * Application entry point.
  */
 int main(void) {
-  thread_t *shelltp = NULL;
 
   /*
    * System initializations.
@@ -139,7 +138,6 @@ int main(void) {
                                             "shell", NORMALPRIO + 1,
                                             shellThread, (void *)&shell_cfg1);
     chThdWait(shelltp);               /* Waiting termination.             */
-    chThdFreeToHeap(shelltp);         /* Returning memory to heap.        */
     chThdSleepMilliseconds(1000);
   }
   return 0;

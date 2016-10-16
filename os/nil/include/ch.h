@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -27,11 +27,12 @@
  * @{
  */
 
-#ifndef _CH_H_
-#define _CH_H_
+#ifndef CH_H
+#define CH_H
 
-#include "chconf.h"
 #include "chtypes.h"
+#include "chconf.h"
+#include "chlicense.h"
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -353,6 +354,52 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
+#if CH_CUSTOMER_LICENSED_NIL == FALSE
+#error "ChibiOS/NIL not licensed"
+#endif
+
+#if (CH_LICENSE_FEATURES != CH_FEATURES_FULL) &&                            \
+    (CH_LICENSE_FEATURES != CH_FEATURES_INTERMEDIATE) &&                    \
+    (CH_LICENSE_FEATURES == CH_FEATURES_BASIC)
+#error "invalid CH_LICENSE_FEATURES setting"
+#endif
+
+/* Restrictions in basic and intermediate modes.*/
+#if (CH_LICENSE_FEATURES == CH_FEATURES_INTERMEDIATE) ||                    \
+    (CH_LICENSE_FEATURES == CH_FEATURES_BASIC)
+
+/* System tick limited to 1000hz.*/
+#if CH_CFG_ST_FREQUENCY > 1000
+#undef CH_CFG_ST_FREQUENCY
+#define CH_CFG_ST_FREQUENCY                 1000
+#endif
+
+/* Restricted subsystems.*/
+#undef CH_CFG_USE_MAILBOXES
+
+#define CH_CFG_USE_MAILBOXES                FALSE
+
+#endif /* (CH_LICENSE_FEATURES == CH_FEATURES_INTERMEDIATE) ||
+          (CH_LICENSE_FEATURES == CH_FEATURES_BASIC) */
+
+/* Restrictions in basic mode.*/
+#if CH_LICENSE_FEATURES == CH_FEATURES_BASIC
+
+/* Tick-Less mode restricted.*/
+#undef CH_CFG_ST_TIMEDELTA
+#define CH_CFG_ST_TIMEDELTA                 0
+
+/* Restricted subsystems.*/
+#undef CH_CFG_USE_MEMCORE
+#undef CH_CFG_USE_MEMPOOLS
+#undef CH_CFG_USE_HEAP
+
+#define CH_CFG_USE_MEMCORE                  FALSE
+#define CH_CFG_USE_MEMPOOLS                 FALSE
+#define CH_CFG_USE_HEAP                     FALSE
+
+#endif /* CH_LICENSE_FEATURES == CH_FEATURES_BASIC */
+
 #if !defined(_CHIBIOS_NIL_CONF_)
 #error "missing or wrong configuration file"
 #endif
@@ -492,7 +539,7 @@ struct nil_thread {
   eventmask_t           epmask;     /**< @brief Pending events mask.        */
 #endif
 #if (CH_DBG_ENABLE_STACK_CHECK == TRUE) || defined(__DOXYGEN__)
-  stkalign_t            *stklimit;  /**< @brief Thread stack boundary.      */
+  stkalign_t            *wabase;    /**< @brief Thread stack boundary.      */
 #endif
   /* Optional extra fields.*/
   CH_CFG_THREAD_EXT_FIELDS
@@ -569,6 +616,11 @@ struct nil_system {
 #define _dbg_enter_lock() (nil.lock_cnt = (cnt_t)1)
 #define _dbg_leave_lock() (nil.lock_cnt = (cnt_t)0)
 #endif
+
+/**
+ * @brief   Utility to make the parameter a quoted string.
+ */
+#define __CH_STRINGIFY(a) #a
 
 /**
  * @name    Threads tables definition macros
@@ -852,6 +904,33 @@ struct nil_system {
  * @api
  */
 #define US2RTC(freq, usec) (rtcnt_t)((((freq) + 999999UL) / 1000000UL) * (usec))
+/** @} */
+
+/**
+ * @name    Semaphores macros
+ * @{
+ */
+/**
+ * @brief   Data part of a static semaphore initializer.
+ * @details This macro should be used when statically initializing a semaphore
+ *          that is part of a bigger structure.
+ *
+ * @param[in] name      the name of the semaphore variable
+ * @param[in] n         the counter initial value, this value must be
+ *                      non-negative
+ */
+#define _SEMAPHORE_DATA(name, n) {n}
+
+/**
+ * @brief   Static semaphore initializer.
+ * @details Statically initialized semaphores require no explicit
+ *          initialization using @p chSemInit().
+ *
+ * @param[in] name      the name of the semaphore variable
+ * @param[in] n         the counter initial value, this value must be
+ *                      non-negative
+ */
+#define SEMAPHORE_DECL(name, n) semaphore_t name = _SEMAPHORE_DATA(name, n)
 /** @} */
 
 /**
@@ -1298,6 +1377,6 @@ extern "C" {
 #include "chmempools.h"
 #include "chheap.h"
 
-#endif /* _CH_H_ */
+#endif /* CH_H */
 
 /** @} */

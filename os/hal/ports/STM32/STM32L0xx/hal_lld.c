@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -273,8 +273,8 @@ void stm32_clock_init(void) {
 #endif
 
   /* Peripherals clock sources setup.*/
-  RCC->CCIPR = STM32_HSI48SEL   | STM32_LPTIM1CLK | STM32_I2C1CLK   |
-               STM32_LPUART1CLK | STM32_USART2CLK | STM32_USART1CLK;
+  RCC->CCIPR = STM32_HSI48SEL   | STM32_LPTIM1SEL | STM32_I2C1SEL   |
+               STM32_LPUART1SEL | STM32_USART2SEL | STM32_USART1SEL;
 
   /* SYSCFG clock enabled here because it is a multi-functional unit shared
      among multiple drivers.*/

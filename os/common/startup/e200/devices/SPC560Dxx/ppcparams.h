@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _PPCPARAMS_H_
-#define _PPCPARAMS_H_
+#ifndef PPCPARAMS_H
+#define PPCPARAMS_H
 
 /**
  * @brief   Family identification macro.
@@ -78,6 +78,6 @@
  */
 #define PPC_NUM_VECTORS             155
 
-#endif /* _PPCPARAMS_H_ */
+#endif /* PPCPARAMS_H */
 
 /** @} */

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CMPARAMS_H_
-#define _CMPARAMS_H_
+#ifndef CMPARAMS_H
+#define CMPARAMS_H
 
 /**
  * @brief   Cortex core model.
@@ -57,9 +57,11 @@
 /* If the device type is not externally defined, for example from the Makefile,
    then a file named board.h is included. This file must contain a device
    definition compatible with the vendor include file.*/
-#if !defined(STM32L051xx) && !defined(STM32L052xx) &&                       \
-    !defined(STM32L053xx) && !defined(STM32L062xx) &&                       \
-    !defined(STM32L063xx) && !defined(STM32L061xx)
+#if !defined(STM32L011xx) && !defined(STM32L031xx) &&                       \
+    !defined(STM32L051xx) && !defined(STM32L052xx) &&                       \
+    !defined(STM32L053xx) && !defined(STM32L061xx) &&                       \
+    !defined(STM32L062xx) && !defined(STM32L063xx) &&                       \
+    !defined(STM32L073xx)
 #include "board.h"
 #endif
 
@@ -78,6 +80,6 @@
 
 #endif /* !defined(_FROM_ASM_) */
 
-#endif /* _CMPARAMS_H_ */
+#endif /* CMPARAMS_H */
 
 /** @} */

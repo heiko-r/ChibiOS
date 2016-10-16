@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 
 /**
- * @file    stm32_tim.h
+ * @file    TIMv1/stm32_tim.h
  * @brief   STM32 TIM units common code.
  * @note    This file requires definitions from the ST STM32 header file.
  *

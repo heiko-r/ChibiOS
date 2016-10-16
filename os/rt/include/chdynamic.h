@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -25,8 +25,8 @@
  * @{
  */
 
-#ifndef _CHDYNAMIC_H_
-#define _CHDYNAMIC_H_
+#ifndef CHDYNAMIC_H
+#define CHDYNAMIC_H
 
 #if (CH_CFG_USE_DYNAMIC == TRUE) || defined(__DOXYGEN__)
 
@@ -94,6 +94,6 @@ extern "C" {
 
 #endif /* CH_CFG_USE_DYNAMIC == TRUE */
 
-#endif /* _CHDYNAMIC_H_ */
+#endif /* CHDYNAMIC_H */
 
 /** @} */

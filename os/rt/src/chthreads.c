@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -172,8 +172,7 @@ thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp) {
   chDbgCheck(MEM_IS_ALIGNED(tdp->wbase, PORT_WORKING_AREA_ALIGN) &&
              MEM_IS_ALIGNED(tdp->wend, PORT_STACK_ALIGN) &&
              (tdp->wend > tdp->wbase) &&
-             ((size_t)((tdp->wend - tdp->wbase) *
-                       sizeof (stkalign_t)) >= THD_WORKING_AREA_SIZE(0)));
+             (((size_t)tdp->wend - (size_t)tdp->wbase) >= THD_WORKING_AREA_SIZE(0)));
   chDbgCheck((tdp->prio <= HIGHPRIO) && (tdp->funcp != NULL));
 
   /* The thread structure is laid out in the upper part of the thread
@@ -182,8 +181,10 @@ thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp) {
   tp = (thread_t *)((uint8_t *)tdp->wend -
                     MEM_ALIGN_NEXT(sizeof (thread_t), PORT_STACK_ALIGN));
 
+#if (CH_DBG_ENABLE_STACK_CHECK == TRUE) || (CH_CFG_USE_DYNAMIC == TRUE)
   /* Stack boundary.*/
-  tp->stklimit = tdp->wbase;
+  tp->wabase = tdp->wbase;
+#endif
 
   /* Setting up the port-dependent part of the working area.*/
   PORT_SETUP_CONTEXT(tp, tdp->wbase, tp, tdp->funcp, tdp->arg);
@@ -215,6 +216,11 @@ thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp) {
  */
 thread_t *chThdCreateSuspended(const thread_descriptor_t *tdp) {
   thread_t *tp;
+
+#if CH_CFG_USE_REGISTRY == TRUE
+  chDbgAssert(chRegFindThreadByWorkingArea(tdp->wbase) == NULL,
+              "working area in use");
+#endif
 
 #if CH_DBG_FILL_THREADS == TRUE
   _thread_memfill((uint8_t *)tdp->wbase,
@@ -275,6 +281,11 @@ thread_t *chThdCreateI(const thread_descriptor_t *tdp) {
 thread_t *chThdCreate(const thread_descriptor_t *tdp) {
   thread_t *tp;
 
+#if CH_CFG_USE_REGISTRY == TRUE
+  chDbgAssert(chRegFindThreadByWorkingArea(tdp->wbase) == NULL,
+              "working area in use");
+#endif
+
 #if CH_DBG_FILL_THREADS == TRUE
   _thread_memfill((uint8_t *)tdp->wbase,
                   (uint8_t *)tdp->wend,
@@ -319,6 +330,11 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
              MEM_IS_ALIGNED(size, PORT_STACK_ALIGN) &&
              (prio <= HIGHPRIO) && (pf != NULL));
 
+#if CH_CFG_USE_REGISTRY == TRUE
+  chDbgAssert(chRegFindThreadByWorkingArea(wsp) == NULL,
+              "working area in use");
+#endif
+
 #if CH_DBG_FILL_THREADS == TRUE
   _thread_memfill((uint8_t *)wsp,
                   (uint8_t *)wsp + size,
@@ -333,8 +349,10 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
   tp = (thread_t *)((uint8_t *)wsp + size -
                     MEM_ALIGN_NEXT(sizeof (thread_t), PORT_STACK_ALIGN));
 
+#if (CH_DBG_ENABLE_STACK_CHECK == TRUE) || (CH_CFG_USE_DYNAMIC == TRUE)
   /* Stack boundary.*/
-  tp->stklimit = (stkalign_t *)wsp;
+  tp->wabase = (stkalign_t *)wsp;
+#endif
 
   /* Setting up the port-dependent part of the working area.*/
   PORT_SETUP_CONTEXT(tp, wsp, tp, pf, arg);
@@ -360,7 +378,8 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
 thread_t *chThdStart(thread_t *tp) {
 
   chSysLock();
-  tp = chThdStartI(tp);
+  chDbgAssert(tp->state == CH_STATE_WTSTART, "wrong state");
+  chSchWakeupS(tp, MSG_OK);
   chSysUnlock();
 
   return tp;
@@ -421,20 +440,20 @@ void chThdRelease(thread_t *tp) {
     switch (tp->flags & CH_FLAG_MODE_MASK) {
 #if CH_CFG_USE_HEAP == TRUE
     case CH_FLAG_MODE_HEAP:
-      chHeapFree(chthdGetStackLimitX(tp));
+      chHeapFree(chThdGetWorkingAreaX(tp));
       break;
 #endif
 #if CH_CFG_USE_MEMPOOLS == TRUE
     case CH_FLAG_MODE_MPOOL:
-      chPoolFree(tp->mpool, chthdGetStackLimitX(tp));
+      chPoolFree(tp->mpool, chThdGetWorkingAreaX(tp));
       break;
 #endif
     default:
       /* Nothing else to do for static threads.*/
       break;
     }
-    return;
 #endif /* CH_CFG_USE_DYNAMIC == TRUE */
+    return;
   }
   chSysUnlock();
 }
@@ -499,7 +518,7 @@ void chThdExitS(msg_t msg) {
      registry because there is no memory to recover.*/
 #if CH_CFG_USE_DYNAMIC == TRUE
   if ((tp->refs == (trefs_t)0) &&
-      (tp->flags & CH_FLAG_MODE_MASK) == CH_FLAG_MODE_STATIC) {
+      ((tp->flags & CH_FLAG_MODE_MASK) == CH_FLAG_MODE_STATIC)) {
     REG_REMOVE(tp);
   }
 #else
@@ -668,7 +687,7 @@ void chThdSleepUntil(systime_t time) {
  *
  * @param[in] prev      absolute system time of the previous deadline
  * @param[in] next      absolute system time of the next deadline
- * @return				the @p next parameter
+ * @return              the @p next parameter
  *
  * @api
  */
@@ -678,7 +697,7 @@ systime_t chThdSleepUntilWindowed(systime_t prev, systime_t next) {
   chSysLock();
   time = chVTGetSystemTimeX();
   if (chVTIsTimeWithinX(time, prev, next)) {
-	chThdSleepS(next - time);
+    chThdSleepS(next - time);
   }
   chSysUnlock();
 
