@@ -39,8 +39,11 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
+# Configuration of Smart Build. (can be yes, no)
+USE_SMART_BUILD = yes
+
 # MCU name
-MCU = atmega1280
+MCU = atmega2560
 
 # Processor frequency.
 F_CPU = 16000000
@@ -60,19 +63,19 @@ OBJDIR = .
 CHIBIOS = ../../..
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/ARDUINO_MEGA/board.mk
-include $(CHIBIOS)/os/hal/ports/AVR/platform.mk
+include $(CHIBIOS)/os/hal/ports/AVR/MEGA/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/AVR/compilers/GCC/mk/port.mk
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(PORTSRC) \
-      $(KERNSRC) \
-      $(TESTSRC) \
-      $(HALSRC) \
-      $(OSALSRC) \
-      $(PLATFORMSRC) \
-      $(BOARDSRC) \
+SRC = $(PORTSRC)                      \
+      $(KERNSRC)                      \
+      $(TESTSRC)                      \
+      $(HALSRC)                       \
+      $(OSALSRC)                      \
+      $(PLATFORMSRC)                  \
+      $(BOARDSRC)                     \
       $(CHIBIOS)/os/various/evtimer.c \
       main.c
 
@@ -104,7 +107,7 @@ DEBUG = dwarf-2
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
 EXTRAINCDIRS = $(CHIBIOS)/os/license $(PORTINC) $(KERNINC) $(TESTINC) \
-               $(HALINC) $(OSALINC) $(PLATFORMINC) \
+               $(HALINC) $(OSALINC) $(PLATFORMINC)                    \
                $(BOARDINC) $(CHIBIOS)/os/various
 
 # Compiler flag to set the C Standard level.

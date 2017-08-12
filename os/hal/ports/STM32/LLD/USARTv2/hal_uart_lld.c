@@ -30,6 +30,20 @@
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
 
+/* For compatibility for those devices without LIN support in the USARTs.*/
+#if !defined(USART_ISR_LBDF)
+#define USART_ISR_LBDF                      0
+#endif
+
+#if !defined(USART_CR2_LBDIE)
+#define USART_CR2_LBDIE                     0
+#endif
+
+/* STM32L0xx/STM32F7xx ST headers difference.*/
+#if !defined(USART_ISR_LBDF)
+#define USART_ISR_LBDF                      USART_ISR_LBD
+#endif
+
 /* STM32L0xx/STM32F7xx ST headers difference.*/
 #if !defined(USART_ISR_LBDF)
 #define USART_ISR_LBDF USART_ISR_LBD
@@ -99,6 +113,25 @@
   STM32_DMA_GETCHANNEL(STM32_UART_UART8_TX_DMA_STREAM,                      \
                        STM32_UART8_TX_DMA_CHN)
 
+/* Workarounds for those devices where UARTs are USARTs.*/
+#if defined(USART4)
+#define UART4 USART4
+#endif
+#if defined(USART5)
+#define UART5 USART5
+#endif
+#if defined(USART7)
+#define UART7 USART7
+#endif
+#if defined(USART8)
+#define UART8 USART8
+#endif
+
+/* Workaround for more differences in headers.*/
+#if !defined(USART_CR1_M0)
+#define USART_CR1_M0 USART_CR1_M
+#endif
+
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -154,7 +187,7 @@ UARTDriver UARTD8;
 /**
  * @brief   Status bits translation.
  *
- * @param[in] sr        USART SR register value
+ * @param[in] isr       USART SR register value
  *
  * @return  The error flags.
  */
@@ -383,11 +416,10 @@ OSAL_IRQ_HANDLER(STM32_USART2_HANDLER) {
 }
 #endif /* STM32_UART_USE_USART2 */
 
-
 #if defined(STM32_USART3_8_HANDLER)
-#if STM32_SERIAL_USE_USART3 || STM32_SERIAL_USE_UART4  ||                   \
-    STM32_SERIAL_USE_UART5  || STM32_SERIAL_USE_USART6 ||                   \
-    STM32_SERIAL_USE_UART7  || STM32_SERIAL_USE_UART8  || defined(__DOXYGEN__)
+#if STM32_UART_USE_USART3 || STM32_UART_USE_UART4  ||                   \
+    STM32_UART_USE_UART5  || STM32_UART_USE_USART6 ||                   \
+    STM32_UART_USE_UART7  || STM32_UART_USE_UART8  || defined(__DOXYGEN__)
 /**
  * @brief   USART3-8 shared interrupt handler.
  *
@@ -649,7 +681,7 @@ void uart_lld_init(void) {
     STM32_UART_USE_UART5  || STM32_UART_USE_USART6 ||                   \
     STM32_UART_USE_UART7  || STM32_UART_USE_UART8
 #if defined(STM32_USART3_8_HANDLER)
-  nvicEnableVector(STM32_USART3_8_NUMBER, STM32_UART_USART3_8_PRIORITY);
+  nvicEnableVector(STM32_USART3_8_NUMBER, STM32_UART_USART3_8_IRQ_PRIORITY);
 #endif
 #endif
 }
@@ -818,7 +850,7 @@ void uart_lld_start(UARTDriver *uartp) {
 
     /* Static DMA setup, the transfer size depends on the USART settings,
        it is 16 bits if M=1 and PCE=0 else it is 8 bits.*/
-    if ((uartp->config->cr1 & (USART_CR1_M | USART_CR1_PCE)) == USART_CR1_M)
+    if ((uartp->config->cr1 & (USART_CR1_M | USART_CR1_PCE)) == USART_CR1_M0)
       uartp->dmamode |= STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
     dmaStreamSetPeripheral(uartp->dmarx, &uartp->usart->RDR);
     dmaStreamSetPeripheral(uartp->dmatx, &uartp->usart->TDR);

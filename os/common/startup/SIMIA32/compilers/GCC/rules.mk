@@ -34,8 +34,16 @@ endif
 ifeq ($(BUILDDIR),.)
   BUILDDIR = build
 endif
-OUTFILES = $(BUILDDIR)/$(PROJECT).exe
-           
+
+# Dependencies directory
+ifeq ($(DEPDIR),)
+  DEPDIR = .dep
+endif
+ifeq ($(DEPDIR),.)
+  DEPDIR = .dep
+endif
+
+OUTFILES = $(BUILDDIR)/$(PROJECT)
 
 # Source files groups and paths
 SRC	      = $(CSRC)$(CPPSRC)
@@ -73,9 +81,10 @@ CPPFLAGS  = $(MCFLAGS) $(OPT) $(CPPOPT) $(CPPWARN) -Wa,-alms=$(LSTDIR)/$(notdir 
 LDFLAGS   = $(MCFLAGS) $(OPT) $(LLIBDIR) -Wl,-Map=$(BUILDDIR)/$(PROJECT).map,--cref,--no-warn-mismatch,$(LDOPT)
 
 # Generate dependency information
-ASFLAGS  += -MD -MP -MF .dep/$(@F).d
-CFLAGS   += -MD -MP -MF .dep/$(@F).d
-CPPFLAGS += -MD -MP -MF .dep/$(@F).d
+ASFLAGS  += -MD -MP -MF $(DEPDIR)/$(@F).d
+ASXFLAGS += -MD -MP -MF $(DEPDIR)/$(@F).d
+CFLAGS   += -MD -MP -MF $(DEPDIR)/$(@F).d
+CPPFLAGS += -MD -MP -MF $(DEPDIR)/$(@F).d
 
 # Paths where to search for sources
 VPATH     = $(SRCPATHS)
@@ -142,7 +151,7 @@ else
 	@$(CC) -c $(ASXFLAGS) -I. $(IINCDIR) $< -o $@
 endif
 
-%.exe: $(OBJS)
+$(BUILDDIR)/$(PROJECT): $(OBJS)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
@@ -158,11 +167,13 @@ $(BUILDDIR)/lib$(PROJECT).a: $(OBJS)
 	@echo
 	@echo Done
 
-clean:
+clean: CLEAN_RULE_HOOK
 	@echo Cleaning
-	-rm -fR .dep $(BUILDDIR)
+	-rm -fR $(DEPDIR) $(BUILDDIR)
 	@echo
 	@echo Done
+
+CLEAN_RULE_HOOK:
 
 .PHONY: gcov
 gcov:
@@ -171,6 +182,6 @@ gcov:
 #
 # Include the dependency files, should be the last of the makefile
 #
--include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
+-include $(shell mkdir $(DEPDIR) 2>/dev/null) $(wildcard $(DEPDIR)/*)
 
 # *** EOF ***
