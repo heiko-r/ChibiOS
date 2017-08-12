@@ -16,16 +16,14 @@
     <identifier>MII_LAN8742A_ID</identifier>
     <bus_type>RMII</bus_type>
   </ethernet_phy>
-  <usb_phy>
-    <bus_type>ULPI</bus_type>
-  </usb_phy>
   <subtype>STM32F767xx</subtype>
   <clocks
     HSEFrequency="8000000"
     HSEBypass="true"
     LSEFrequency="32768"
     LSEBypass="false"
-    VDD="300" />
+    VDD="300"
+    LSEDrive="3 High Drive (default)" />
   <ports>
     <GPIOA>
       <pin0

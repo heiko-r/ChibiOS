@@ -150,7 +150,11 @@ void stm32_clock_init(void) {
 
 #if !STM32_NO_INIT
   /* PWR clock enable.*/
+#if defined(HAL_USE_RTC) && defined(RCC_APB1ENR_RTCAPBEN)
+  RCC->APB1ENR = RCC_APB1ENR_PWREN | RCC_APB1ENR_RTCAPBEN;
+#else
   RCC->APB1ENR = RCC_APB1ENR_PWREN;
+#endif
 
   /* PWR initialization.*/
 #if defined(STM32F4XX) || defined(__DOXYGEN__)
@@ -240,7 +244,6 @@ void stm32_clock_init(void) {
   /* PLLSAI activation.*/
   RCC->PLLSAICFGR = STM32_PLLSAIR | STM32_PLLSAIN | STM32_PLLSAIP |
                     STM32_PLLSAIQ | STM32_PLLSAIM;
-  
   RCC->CR |= RCC_CR_PLLSAION;
 
   /* Waiting for PLL lock.*/

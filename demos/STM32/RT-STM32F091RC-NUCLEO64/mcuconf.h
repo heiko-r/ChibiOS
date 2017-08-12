@@ -83,10 +83,14 @@
 #define STM32_GPT_USE_TIM1                  FALSE
 #define STM32_GPT_USE_TIM2                  FALSE
 #define STM32_GPT_USE_TIM3                  FALSE
+#define STM32_GPT_USE_TIM6                  FALSE
+#define STM32_GPT_USE_TIM7                  FALSE
 #define STM32_GPT_USE_TIM14                 FALSE
 #define STM32_GPT_TIM1_IRQ_PRIORITY         2
 #define STM32_GPT_TIM2_IRQ_PRIORITY         2
 #define STM32_GPT_TIM3_IRQ_PRIORITY         2
+#define STM32_GPT_TIM6_IRQ_PRIORITY         2
+#define STM32_GPT_TIM7_IRQ_PRIORITY         2
 #define STM32_GPT_TIM14_IRQ_PRIORITY        2
 
 /*
@@ -195,7 +199,7 @@
 #define STM32_UART_USE_UART8                FALSE
 #define STM32_UART_USART1_IRQ_PRIORITY      3
 #define STM32_UART_USART2_IRQ_PRIORITY      3
-#define STM32_UART_USART3_8_PRIORITY        3
+#define STM32_UART_USART3_8_IRQ_PRIORITY    3
 #define STM32_UART_USART1_DMA_PRIORITY      0
 #define STM32_UART_USART2_DMA_PRIORITY      0
 #define STM32_UART_USART3_DMA_PRIORITY      0
