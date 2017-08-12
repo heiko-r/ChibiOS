@@ -24,7 +24,7 @@
 
 #include "hal.h"
 
-#if HAL_USE_QSPI || defined(__DOXYGEN__)
+#if (HAL_USE_QSPI == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -35,7 +35,7 @@
 /*===========================================================================*/
 
 /** @brief QSPID1 driver identifier.*/
-#if PLATFORM_QSPI_USE_QSPI1 || defined(__DOXYGEN__)
+#if (PLATFORM_QSPI_USE_QSPI1 == TRUE) || defined(__DOXYGEN__)
 QSPIDriver QSPID1;
 #endif
 
@@ -116,7 +116,7 @@ void qspi_lld_stop(QSPIDriver *qspip) {
  * @post    At the end of the operation the configured callback is invoked.
  *
  * @param[in] qspip     pointer to the @p QSPIDriver object
- * @param[in] cmd       pointer to the command descriptor
+ * @param[in] cmdp      pointer to the command descriptor
  *
  * @notapi
  */
@@ -131,7 +131,7 @@ void qspi_lld_command(QSPIDriver *qspip, const qspi_command_t *cmdp) {
  * @post    At the end of the operation the configured callback is invoked.
  *
  * @param[in] qspip     pointer to the @p QSPIDriver object
- * @param[in] cmd       pointer to the command descriptor
+ * @param[in] cmdp      pointer to the command descriptor
  * @param[in] n         number of bytes to send
  * @param[in] txbuf     the pointer to the transmit buffer
  *
@@ -151,7 +151,7 @@ void qspi_lld_send(QSPIDriver *qspip, const qspi_command_t *cmdp,
  * @post    At the end of the operation the configured callback is invoked.
  *
  * @param[in] qspip     pointer to the @p QSPIDriver object
- * @param[in] cmd       pointer to the command descriptor
+ * @param[in] cmdp      pointer to the command descriptor
  * @param[in] n         number of bytes to send
  * @param[out] rxbuf    the pointer to the receive buffer
  *

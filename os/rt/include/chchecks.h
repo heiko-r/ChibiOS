@@ -20,9 +20,6 @@
 /**
  * @file    chchecks.h
  * @brief   Configuration checks macros and structures.
- *
- * @addtogroup checks
- * @{
  */
 
 #ifndef CHCHECKS_H
@@ -40,13 +37,13 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-#if CH_CUSTOMER_LICENSED_RT == FALSE
+#if CH_CUSTOMER_LIC_RT == FALSE
 #error "ChibiOS/RT not licensed"
 #endif
 
 #if (CH_LICENSE_FEATURES != CH_FEATURES_FULL) &&                            \
     (CH_LICENSE_FEATURES != CH_FEATURES_INTERMEDIATE) &&                    \
-    (CH_LICENSE_FEATURES == CH_FEATURES_BASIC)
+    (CH_LICENSE_FEATURES != CH_FEATURES_BASIC)
 #error "invalid CH_LICENSE_FEATURES setting"
 #endif
 
@@ -107,5 +104,3 @@
 /*===========================================================================*/
 
 #endif /* CHCHECKS_H */
-
-/** @} */
